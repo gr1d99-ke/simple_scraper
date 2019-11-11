@@ -13,7 +13,7 @@ RSpec.describe "ScrapeLinks", type: :request do
 
     context "When depth is 0" do
       let(:scrape_links_params) do
-        { name: "test", email: "test@user.com", url: url, depth: "0" }
+        { email: "test@user.com", url: url, depth: "0" }
       end
 
       it "generates links.txt file" do

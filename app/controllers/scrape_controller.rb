@@ -18,7 +18,7 @@ class ScrapeController < ApplicationController
   private
 
   def link_params
-    params.permit(:name, :email, :url, :depth)
+    params.permit(:email, :url, :depth)
   end
 
   def valid_url?
