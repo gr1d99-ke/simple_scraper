@@ -21,7 +21,7 @@
 
         <div class="form-group">
           <%= label_tag(:depth, nil, { for: "depth_id"}) %>
-          <%= select_tag(:depth_id, options_for_select([[0, 0], [1, 1]], 0), class: "form-control") %>
+          <%= select_tag(:depth, options_for_select([[0, 0], [1, 1]], 0), class: "form-control", id: :depth_id) %>
         </div>
 
         <%= submit_tag(:'fetch me all links', class: 'btn btn-primary') %>

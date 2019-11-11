@@ -27,7 +27,7 @@ class GenerateLinksResultsService
     CSV.open("#{storage_path}links.csv", 'wb') do |csv|
       csv << %i[No Name Link]
       links.each do |link|
-        csv << [index, link[:name], link[:url]]
+        csv << [index, link["name"], link["url"]]
         index += 1
       end
     end
