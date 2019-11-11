@@ -20,6 +20,23 @@ feature 'scraping links process' do
     end
   end
 
+  scenario 'user enters details to the scraper form' do
+    email = 'test@example.com'
+    expect(page).to have_selector(:xpath, form_xpath)
+
+    within(:xpath, form_xpath) do
+      expect(find_field('Depth').value).to eq("0")
+
+      fill_in('Email', with: email)
+      fill_in('Url', with: url)
+      select("1", from: "Depth")
+
+      expect(find_field('Email').value).to eq(email)
+      expect(find_field('Url').value).to eq(url)
+      expect(find_field('Depth').value).to eq("1")
+    end
+  end
+
   scenario 'user submits links scraping request' do
     perform_enqueued_jobs do
       stub_custom_request(url: url, body: body)
@@ -27,6 +44,7 @@ feature 'scraping links process' do
       within(:xpath, form_xpath) do
         fill_in('Email', with: 'test@example.com')
         fill_in('Url', with: url)
+        select("1", from: "Depth")
         click_on('fetch me all links')
       end
 
