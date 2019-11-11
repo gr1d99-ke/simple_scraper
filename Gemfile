@@ -35,11 +35,11 @@ gem 'jbuilder', '~> 2.5'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.1.0', require: false
-gem 'bootstrap', '~> 4.1.3'
+gem "bootstrap", ">= 4.3.1"
 gem 'faraday'
 gem 'figaro'
 gem 'jquery-rails'
-gem 'nokogiri'
+gem "nokogiri", ">= 1.10.4"
 gem 'sidekiq'
 
 group :development, :test do

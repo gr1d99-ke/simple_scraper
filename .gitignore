@@ -32,3 +32,5 @@ public/links
 
 # Ignore application configuration
 /config/application.yml
+
+.generators
