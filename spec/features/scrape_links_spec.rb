@@ -62,6 +62,7 @@ feature 'scraping links process' do
     stub_custom_request(url: url, body: body)
 
     within(:xpath, form_xpath) do
+      fill_in('Name', with: 'test')
       fill_in('Email', with: 'test@example.com')
       fill_in('Url', with: "1")
       select("1", from: "Depth")
