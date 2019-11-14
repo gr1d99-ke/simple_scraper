@@ -6,7 +6,8 @@ class NokogiriService
   end
 
   def call
-    body = Faraday.get(url).body
+    connection = Faraday.new(url)
+    body = connection.get(url).body
     process(body: body)
   end
 
