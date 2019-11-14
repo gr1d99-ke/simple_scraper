@@ -4,9 +4,11 @@ class ScrapeController < ApplicationController
   def scrape_links
     return redirect_to root_path, alert: "The link you provided is not valid, check and try again" unless valid_url?
 
-    scrape_name_id = "#{URI.parse(link_params[:url]).host.split(".")[0]}-#{SecureRandom.uuid}"
+    scrape_name_id = "#{link_params[:name]}-#{SecureRandom.uuid}"
 
-    GenerateLinksResultsJob.perform_later(url: link_params[:url], email: link_params[:email], depth: link_params[:depth], name: scrape_name_id)
+    options = { url: link_params[:url], email: link_params[:email], depth: link_params[:depth], name: scrape_name_id }.stringify_keys!
+
+    ScrapeJob.perform_later(options)
 
     flash['message'] = 'We will notify and send you all links via the email you provided shortly'
 
@@ -16,7 +18,7 @@ class ScrapeController < ApplicationController
   private
 
   def link_params
-    params.permit(:email, :url, :depth)
+    params.permit(:name, :email, :url, :depth)
   end
 
   def valid_url?

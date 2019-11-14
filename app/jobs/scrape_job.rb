@@ -1,18 +1,17 @@
 # frozen_string_literal: true
 
-class GenerateLinksResultsJob < ApplicationJob
+class ScrapeJob < ApplicationJob
   queue_as :default
 
-  def perform(url:, email:, depth:, name:)
-    document = NokogiriService.call(url: url)
-    initial_links = LinksScraperService.call(doc: document)
+  def perform(options = {})
+    document      = NokogiriService.call(url: options["url"])
+    initial_links = ExtractUrlService.call(doc: document)
+    saved_link    = Link.create(name: options["name"], visited: { "0": initial_links })
 
-    saved_link = Link.create(name: name, visited: { "0": initial_links })
-
-    if depth.to_i.zero?
-      file_path = GenerateLinksResultsService.call(links: saved_link.visited["0"])
-      SendLinksResultsJob.perform_later(to: email, file_path: file_path)
-    elsif depth.to_i.equal?(1)
+    if options["depth"].to_i.zero?
+      file_path = UrlsCsvService.generate(links: saved_link.visited["0"])
+      SendLinksResultsJob.perform_later(to: options["email"], file_path: file_path)
+    elsif options["depth"].to_i.equal?(1)
       initial_extracted_urls = saved_link.visited["0"].map { |link_data| link_data["url"] }
 
       initial_extracted_urls.each do |url|
@@ -22,7 +21,7 @@ class GenerateLinksResultsJob < ApplicationJob
           next
         end
 
-        extracted_links = LinksScraperService.call(doc: document)
+        extracted_links = ExtractUrlService.call(doc: document)
 
         if saved_link.visited["1"].nil?
           saved_link.visited["1"] = extracted_links
@@ -46,8 +45,8 @@ class GenerateLinksResultsJob < ApplicationJob
         cleaned_saved_urls << scraped_url
       end
 
-      file_path = GenerateLinksResultsService.call(links: cleaned_links)
-      SendLinksResultsJob.perform_later(to: email, file_path: file_path)
+      file_path = UrlsCsvService.generate(links: cleaned_links)
+      SendLinksResultsJob.perform_later(to: options["email"], file_path: file_path)
     end
   end
 end

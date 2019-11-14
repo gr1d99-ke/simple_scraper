@@ -12,6 +12,7 @@ feature 'scraping links process' do
   scenario 'user sees link scraper form' do
     expect(page).to have_selector(:xpath, form_xpath)
     within(:xpath, form_xpath) do
+      expect(page).to have_selector(:xpath, ".//input[@name='name']")
       expect(page).to have_selector(:xpath, ".//input[@name='email']")
       expect(page).to have_selector(:xpath, ".//input[@name='url']")
       expect(page).to have_selector(
@@ -22,15 +23,18 @@ feature 'scraping links process' do
 
   scenario 'user enters details to the scraper form' do
     email = 'test@example.com'
+    name = 'test'
     expect(page).to have_selector(:xpath, form_xpath)
 
     within(:xpath, form_xpath) do
       expect(find_field('Depth').value).to eq("0")
 
       fill_in('Email', with: email)
+      fill_in('Name', with: name)
       fill_in('Url', with: url)
       select("1", from: "Depth")
 
+      expect(find_field('Name').value).to eq(name)
       expect(find_field('Email').value).to eq(email)
       expect(find_field('Url').value).to eq(url)
       expect(find_field('Depth').value).to eq("1")
@@ -43,6 +47,7 @@ feature 'scraping links process' do
       stub_custom_request(url: /https:\/\/example.com\//, body: body)
 
       within(:xpath, form_xpath) do
+        fill_in('Email', with: 'test')
         fill_in('Email', with: 'test@example.com')
         fill_in('Url', with: url)
         select("1", from: "Depth")
@@ -57,6 +62,7 @@ feature 'scraping links process' do
     stub_custom_request(url: url, body: body)
 
     within(:xpath, form_xpath) do
+      fill_in('Name', with: 'test')
       fill_in('Email', with: 'test@example.com')
       fill_in('Url', with: "1")
       select("1", from: "Depth")
