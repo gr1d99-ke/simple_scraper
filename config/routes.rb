@@ -4,5 +4,5 @@ Rails.application.routes.draw do
   mount Sidekiq::Web => '/sidekiq'
 
   root to: 'welcome#index'
-  resources :scrape, only: :new
+  resources :scrapes, only: %i[new create]
 end

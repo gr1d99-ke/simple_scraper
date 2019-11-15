@@ -13,20 +13,20 @@ RSpec.describe "ScrapeLinks", type: :request do
 
     context "When depth is 0" do
       let(:scrape_links_params) do
-        { name: "test", email: "test@user.com", url: url, depth: "0" }
+        { uri: { email: "test@user.com", host: url, depth: "0" } }
       end
 
       it "generates links.txt file" do
         perform_enqueued_jobs do
-          post scrape_links_path, params: scrape_links_params
+          post scrapes_path, params: scrape_links_params
           expect(File.exist?(storage_path)).to be_truthy
         end
       end
 
       it "sends email" do
         perform_enqueued_jobs do
-          post scrape_links_path, params: scrape_links_params
-          expect(emails.last.to).to eq([scrape_links_params[:email]])
+          post scrapes_path, params: scrape_links_params
+          expect(emails.last.to).to eq([scrape_links_params[:uri][:email]])
           expect(emails.last.subject).to eq("Scraped links results")
           expect(emails.last.from).to eq(["no-reply@example.com"])
         end
@@ -34,14 +34,14 @@ RSpec.describe "ScrapeLinks", type: :request do
 
       it "saves scraped links" do
         perform_enqueued_jobs do
-          expect { post scrape_links_path, params: scrape_links_params }.to change(Link, :count).from(0).to(1)
+          expect { post scrapes_path, params: scrape_links_params }.to change(Link, :count).from(0).to(1)
         end
       end
     end
 
     context "When depth is greater than 1" do
       let(:scrape_links_params) do
-        { email: "test@user.com", url: url, depth: "1" }
+        { uri: { email: "test@user.com", host: url, depth: "1" } }
       end
 
       before do
@@ -50,15 +50,15 @@ RSpec.describe "ScrapeLinks", type: :request do
 
       it "generates links.txt file" do
         perform_enqueued_jobs do
-          post scrape_links_path, params: scrape_links_params
+          post scrapes_path, params: scrape_links_params
           expect(File.exist?(storage_path)).to be_truthy
         end
       end
 
       it "sends email" do
         perform_enqueued_jobs do
-          post scrape_links_path, params: scrape_links_params
-          expect(emails.last.to).to eq([scrape_links_params[:email]])
+          post scrapes_path, params: scrape_links_params
+          expect(emails.last.to).to eq([scrape_links_params[:uri][:email]])
           expect(emails.last.subject).to eq("Scraped links results")
           expect(emails.last.from).to eq(["no-reply@example.com"])
         end
@@ -66,7 +66,7 @@ RSpec.describe "ScrapeLinks", type: :request do
 
       it "saves scraped links" do
         perform_enqueued_jobs do
-          expect { post scrape_links_path, params: scrape_links_params }.to change(Link, :count).from(0).to(1)
+          expect { post scrapes_path, params: scrape_links_params }.to change(Link, :count).from(0).to(1)
         end
       end
     end
