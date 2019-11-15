@@ -15,6 +15,8 @@ class ScrapeJob < ApplicationJob
       initial_extracted_urls = saved_link.visited["0"].map { |link_data| link_data["url"] }
 
       initial_extracted_urls.each do |url|
+        next unless Urls.url_valid?(url)
+
         begin
           document = NokogiriService.call(url: url)
         rescue Faraday::ConnectionFailed => e
