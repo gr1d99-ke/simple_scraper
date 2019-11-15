@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class LinksScraperService
+class ExtractUrlService
   attr_reader :expression, :links
 
   def initialize(doc:)

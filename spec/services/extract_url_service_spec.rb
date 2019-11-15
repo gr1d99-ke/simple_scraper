@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe LinksScraperService, type: :service do
+RSpec.describe ExtractUrlService, type: :service do
   let(:valid_file) { File.read("#{scraper_test_files_path}links.html") }
 
   describe '.call' do
