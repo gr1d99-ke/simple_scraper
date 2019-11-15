@@ -3,34 +3,8 @@
     <div class="card-header text-center">Web Scraper</div>
     <div class="card-body">
       <h4 class="card-title text-center">Extract almost all links in any website</h4>
-      <p class="card-text text-justify">This application will try to extract any link that it finds in the url that you will provide and then email you results when it is done</p>
-    </div>
-  </div>
-  <div class="card text-white bg-light mb-3 mt-5">
-    <div class="card-body">
-      <%= form_with(url: scrape_links_path, method: :post, html: { name: 'links-scraper-form' }) do %>
-        <div class="form-group">
-          <%= label_tag(:name) %>
-          <%= text_field_tag(:name, nil, type: 'text', placeholder: 'eg name of site to scrape', class: 'form-control', required: true) %>
-        </div>
-
-        <div class="form-group">
-          <%= label_tag(:email) %>
-          <%= text_field_tag(:email, nil, type: 'email', placeholder: 'you@example.com', class: 'form-control', required: true) %>
-        </div>
-
-        <div class="form-group">
-          <%= label_tag(:url) %>
-          <%= text_field_tag(:url, nil, placeholder: 'target url', class: 'form-control', required: true) %>
-        </div>
-
-        <div class="form-group">
-          <%= label_tag(:depth, nil, { for: "depth_id"}) %>
-          <%= select_tag(:depth, options_for_select([[0, 0], [1, 1]], 0), class: "form-control", id: :depth_id) %>
-        </div>
-
-        <%= submit_tag(:'fetch me all links', class: 'btn btn-primary') %>
-      <% end %>
+      <p class="card-text text-justify">This application will try to extract any link that it finds in the provided url and email you results in an excel file when it is done</p>
+      <%= link_to("Get Started", new_scrape_path, { class: "btn btn-primary"}) %>
     </div>
   </div>
 </div>

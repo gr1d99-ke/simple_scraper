@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_11_123550) do
+ActiveRecord::Schema.define(version: 2019_11_15_130001) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,4 +22,32 @@ ActiveRecord::Schema.define(version: 2019_11_11_123550) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "scraped_uris", force: :cascade do |t|
+    t.bigint "uri_id"
+    t.bigint "user_id"
+    t.jsonb "links"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["uri_id"], name: "index_scraped_uris_on_uri_id"
+    t.index ["user_id"], name: "index_scraped_uris_on_user_id"
+  end
+
+  create_table "uris", force: :cascade do |t|
+    t.string "name"
+    t.string "host"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["user_id"], name: "index_uris_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_foreign_key "scraped_uris", "uris"
+  add_foreign_key "scraped_uris", "users"
+  add_foreign_key "uris", "users"
 end

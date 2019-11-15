@@ -15,6 +15,10 @@ class ScrapeController < ApplicationController
     redirect_to root_path
   end
 
+  def new
+    @form = UriForm.new(Uri.new)
+  end
+
   private
 
   def link_params
