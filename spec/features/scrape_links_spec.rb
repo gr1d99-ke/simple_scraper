@@ -67,6 +67,6 @@ feature 'scraping links process' do
       click_on('fetch me all links')
     end
 
-    expect(page).to have_content("The link you provided is not valid, check and try again")
+    expect(page).to have_content("Host is not a valid url")
   end
 end

@@ -11,6 +11,39 @@ RSpec.describe "ScrapeLinks", type: :request do
       stub_custom_request(url: url, body: body)
     end
 
+    context "when params are not valid" do
+      let(:params) { { uri: {} } }
+
+      context "when host is blank" do
+        before { params[:uri].merge!(email: "test@user.com", depth: 0, host: "") }
+
+        it "does not create uri" do
+          expect { post scrapes_path, params: params }.not_to change(Uri, :count)
+        end
+
+        it "creates user" do
+          expect { post scrapes_path, params: params }.to change(User, :count)
+        end
+      end
+
+      context "when email is blank" do
+        before { params[:uri].merge!(host: "https://www.gmail.com", depth: 0, email: "") }
+
+        it "does not create uri" do
+          expect { post scrapes_path, params: params }.not_to change(Uri, :count)
+        end
+
+        it "does not create user" do
+          expect { post scrapes_path, params: params }.not_to change(User, :count)
+        end
+
+        it "flashes notice" do
+          post scrapes_path, params: params
+          expect(response.body).to include("Your email is required")
+        end
+      end
+    end
+
     context "When depth is 0" do
       let(:scrape_links_params) do
         { uri: { email: "test@user.com", host: url, depth: "0" } }
@@ -32,9 +65,14 @@ RSpec.describe "ScrapeLinks", type: :request do
         end
       end
 
-      it "saves scraped links" do
+      it "does not save user when the email does not exist" do
+        post scrapes_path, params: scrape_links_params
+        expect { post scrapes_path, params: scrape_links_params }.not_to change(User, :count)
+      end
+
+      it "saves scraped scraped uri" do
         perform_enqueued_jobs do
-          expect { post scrapes_path, params: scrape_links_params }.to change(Link, :count).from(0).to(1)
+          expect { post scrapes_path, params: scrape_links_params }.to change(ScrapedUri, :count).from(0).to(1)
         end
       end
     end
@@ -66,7 +104,8 @@ RSpec.describe "ScrapeLinks", type: :request do
 
       it "saves scraped links" do
         perform_enqueued_jobs do
-          expect { post scrapes_path, params: scrape_links_params }.to change(Link, :count).from(0).to(1)
+          expect { post scrapes_path, params: scrape_links_params }.to change(ScrapedUri, :count).from(0).to(1)
+          expect(ScrapedUri.last.links.keys).to eq(["0", "1"])
         end
       end
     end

@@ -23,9 +23,10 @@ ActiveRecord::Schema.define(version: 2019_11_15_130001) do
   end
 
   create_table "scraped_uris", force: :cascade do |t|
-    t.bigint "uri_id"
-    t.bigint "user_id"
-    t.jsonb "links"
+    t.bigint "uri_id", null: false
+    t.bigint "user_id", null: false
+    t.integer "depth", default: 0, null: false
+    t.jsonb "links", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["uri_id"], name: "index_scraped_uris_on_uri_id"
@@ -33,16 +34,16 @@ ActiveRecord::Schema.define(version: 2019_11_15_130001) do
   end
 
   create_table "uris", force: :cascade do |t|
-    t.string "name"
-    t.string "host"
+    t.string "name", null: false
+    t.string "host", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id"
+    t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_uris_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "email"
+    t.string "email", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

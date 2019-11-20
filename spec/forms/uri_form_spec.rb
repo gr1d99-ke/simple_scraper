@@ -29,7 +29,7 @@ describe UriForm do
           other_form.save if other_form.validate(valid_params)
         end
 
-        it "contains error message" do
+        it "sets error message" do
           expect(form.validate(valid_params)).to be_falsey
           expect(form.errors.details.keys.length).to be(1)
           expect(form.errors.details[:name].present?).to be_truthy
@@ -39,7 +39,17 @@ describe UriForm do
       context "when host is not present" do
         let(:params) { { name: "test", user_id: user.id } }
 
-        it "contains error message" do
+        it "sets error message" do
+          expect(form.validate(params)).to be_falsey
+          expect(form.errors.details.keys.length).to be(1)
+          expect(form.errors.details[:host].present?).to be_truthy
+        end
+      end
+
+      context "when host is not valid" do
+        let(:params) { { name: "test", user_id: user.id, host: "1" } }
+
+        it "sets error message" do
           expect(form.validate(params)).to be_falsey
           expect(form.errors.details.keys.length).to be(1)
           expect(form.errors.details[:host].present?).to be_truthy
