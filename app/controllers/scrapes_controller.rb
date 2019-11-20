@@ -11,8 +11,8 @@ class ScrapesController < ApplicationController
     @user_form = UserForm.new(User.new)
     if @user_form.validate(email: scrape_params[:email])
       @user_form.save
-    elsif @user_form.errors.messages[:email].equal?("has already been taken")
-      @user_form = OpenStruct.new(model: User.find(scrape_params[:email]))
+    elsif @user_form.errors.messages[:email] && @user_form.errors.messages[:email].size == 1  && @user_form.errors.messages[:email].first.eql?("has already been taken")
+      @user_form = OpenStruct.new(model: User.find_by(email: scrape_params[:email]))
     else
       flash.now[:alert] = "Your email is required"
     end
