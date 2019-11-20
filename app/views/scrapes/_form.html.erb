@@ -1,0 +1,29 @@
+<%= form_with(model: form, url: scrapes_path, local: true, method: :post, html: { name: 'links-scraper-form' }) do |f| %>
+  <% if form.errors.any? %>
+    <div id="error_explanation">
+      <p><%= pluralize(form.errors.count, "error") %> prohibited this scrape from being processed: </p>
+      <ul>
+        <% form.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= label_tag(:email) %>
+    <%= email_field_tag(:email, nil, name: "uri[email]", placeholder: 'So that we can email you the results', class: 'form-control', required: true) %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label(:host) %>
+    <%= f.text_field(:host, placeholder: 'https://www.example.com', class: 'form-control', required: false) %>
+  </div>
+
+  <div class="form-group">
+    <%= label_tag(:depth) %>
+    <%= select_tag(:depth, options_for_select([[0, 0], [1, 1]], 0), name: 'uri[depth]', class: 'form-control') %>
+  </div>
+
+  <%= f.submit(:'fetch me all links', class: 'btn btn-primary') %>
+<% end %>
