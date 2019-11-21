@@ -71,4 +71,7 @@ Rails.application.configure do
   config.action_mailer.default_options = {
     from: 'no-reply@example.com'
   }
+
+  # Redis
+  Redis.current = Redis.new(host: "127.0.0.1", port: "6379", db: "1")
 end

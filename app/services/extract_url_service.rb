@@ -23,9 +23,9 @@ class ExtractUrlService
 
   def fetch_links
     doc.xpath(expression).each do |element|
-      links << { name: element.text, url: element['href'] }
-    end
+      data = { "name": element.text, url: element['href'] }.to_json
 
-    links
+      Redis.current.sadd("scraped_links", data)
+    end
   end
 end

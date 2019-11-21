@@ -3,8 +3,7 @@
 require "csv"
 
 class UrlsCsvService
-  def initialize(links:)
-    @links = links
+  def initialize
     @storage_path = Rails.root.join('public/links/')
   end
 
@@ -12,8 +11,8 @@ class UrlsCsvService
     _generate
   end
 
-  def self.generate(links:)
-    new(links: links).generate
+  def self.generate
+    new.generate
   end
 
   private
@@ -26,9 +25,12 @@ class UrlsCsvService
     index = 1
     ::CSV.open("#{storage_path}links.csv", 'wb') do |csv|
       csv << %i[No Name Link]
-      links.each do |link|
-        csv << [index, link["name"], link["url"]]
+      Redis.current.smembers("scraped_links").each do |member|
+        link_info = JSON.parse(member)
+        csv << [index, link_info["name"], link_info["url"]]
         index += 1
+      rescue JSON::ParserError
+        next
       end
     end
 
