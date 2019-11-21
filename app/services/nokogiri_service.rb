@@ -6,8 +6,12 @@ class NokogiriService
   end
 
   def call
-    connection = Faraday.new(url)
-    body = connection.get(url).body
+    connection = Faraday.new(
+      url: url,
+      ssl: { verify: false }
+    )
+
+    body = connection.get.body
     process(body: body)
   end
 

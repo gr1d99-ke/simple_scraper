@@ -4,45 +4,44 @@ class ScrapeJob < ApplicationJob
   queue_as :default
 
   def perform(options = {})
+    scrape_depth = options["depth"].to_i
+
+    cleanup_scraped_links
+
     uri = Uri.find(options["uri_id"])
-
     document = NokogiriService.call(url: uri.host)
-    ExtractUrlService.call(doc: document)
+    ExtractUrlService.call(document, 0)
 
-    if options["depth"].to_i.zero?
-      file_path = UrlsCsvService.generate
+    if scrape_depth.zero?
+      file_path = UrlsCsvService.generate(0)
       SendLinksResultsJob.perform_later(to: uri.user.email, file_path: file_path)
-    elsif options["depth"].to_i.equal?(1)
-      initial_extracted_urls = scraped_uri.links["0"].map { |link_data| link_data["url"] }
-
-      initial_extracted_urls.each do |url|
-        next unless Urls.url_valid?(url)
+    elsif scrape_depth.equal?(1)
+      Redis.current.smembers("scraped_links:0").each do |member|
+        next unless Urls.url_valid?(JSON.parse(member)["url"])
 
         begin
-          document = NokogiriService.call(url: url)
-        rescue Faraday::ConnectionFailed => e
+          document = NokogiriService.call(url: JSON.parse(member)["url"])
+        rescue Faraday::ConnectionFailed
           next
         end
 
-        extracted_links = ExtractUrlService.call(doc: document)
-
-        if scraped_uri.links["1"].nil?
-          scraped_uri.links["1"] = extracted_links
-        else
-          scraped_uri.links["1"] += extracted_links
-        end
+        ExtractUrlService.call(document, scrape_depth)
       end
 
-      scraped_uri.save
-
-      # let's now clean the links and send cleaned data
-      all_links = scraped_uri.links["0"] + scraped_uri.links["1"]
-      all_links.each do |saved_link_dict|
-        Redis.current.sadd("scraped_links", saved_link_dict)
-      end
-
-      file_path = UrlsCsvService.generate
+      file_path = UrlsCsvService.generate(scrape_depth)
       SendLinksResultsJob.perform_later(to: uri.user.email, file_path: file_path)
+    end
+
+    cleanup_scraped_links
+  end
+
+  private
+
+  def cleanup_scraped_links
+    redis_keys = Redis.current.keys("scraped_links:*")
+
+    if redis_keys.size > 0
+      Redis.current.del(redis_keys)
     end
   end
 end
