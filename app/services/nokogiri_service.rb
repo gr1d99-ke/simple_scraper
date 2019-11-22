@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class NokogiriService
+  attr_reader :url
+
   def initialize(url:)
     @url = url
   end
@@ -20,8 +22,6 @@ class NokogiriService
   end
 
   private
-
-  attr_reader :url
 
   def process(body:)
     Nokogiri::HTML.fragment(body)
