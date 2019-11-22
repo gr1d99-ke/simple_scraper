@@ -74,4 +74,6 @@ Rails.application.configure do
 
   # Redis
   Redis.current = Redis.new(host: "127.0.0.1", port: "6379", db: "1")
+
+  config.log_level = :debug
 end

@@ -3,17 +3,18 @@
 require "csv"
 
 class UrlsCsvService
-  def initialize(depth)
+  def initialize(depth, uri_id)
     @storage_path = Rails.root.join('public/links/')
     @depth = depth
+    @uri_id = uri_id
   end
 
   def generate
     _generate
   end
 
-  def self.generate(depth)
-    new(depth).generate
+  def self.generate(depth, uri_id)
+    new(depth, uri_id).generate
   end
 
   private
@@ -23,13 +24,10 @@ class UrlsCsvService
   def _generate
     link_file = "#{storage_path}links.csv"
     FileUtils.mkdir_p(storage_path) unless File.exist?(storage_path)
-    index = 1
     ::CSV.open("#{storage_path}links.csv", 'wb') do |csv|
-      csv << %i[No Name Link]
-      Redis.current.smembers("scraped_links:#{@depth}").each do |member|
-        link_info = JSON.parse(member)
-        csv << [index, link_info["name"], link_info["url"]]
-        index += 1
+      csv << %i[Url]
+      Redis.current.smembers("scraped_links:#{@depth}:#{@uri_id}").each do |url|
+        csv << [url]
       end
     end
 

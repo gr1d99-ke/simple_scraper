@@ -3,19 +3,20 @@
 class ExtractUrlService
   attr_reader :expression, :links
 
-  def initialize(doc:, depth:)
+  def initialize(doc:, depth:, uri_id:)
     @doc = doc
     @depth = depth
     @expression = './/a'
     @links = []
+    @uri_id = uri_id
   end
 
   def call
     fetch_links
   end
 
-  def self.call(doc, depth)
-    new(doc: doc, depth: depth).call
+  def self.call(doc, depth, uri_id)
+    new(doc: doc, depth: depth, uri_id: uri_id).call
   end
 
   private
@@ -24,11 +25,7 @@ class ExtractUrlService
 
   def fetch_links
     doc.xpath(expression).each do |element|
-      data = {}
-      link_name = element.text.blank? ? SecureRandom.uuid : element.text
-      data[:name] = link_name
-      data[:url] = element['href']
-      Redis.current.sadd("scraped_links:#{@depth}", data.to_json)
+      Redis.current.sadd("scraped_links:#{@depth}:#{@uri_id}", element['href'])
     end
   end
 end
