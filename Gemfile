@@ -40,9 +40,10 @@ gem 'faraday'
 gem 'figaro'
 gem 'jquery-rails'
 gem "nokogiri", ">= 1.10.4"
-gem 'sidekiq'
+gem "redis"
 gem 'reform'
 gem 'reform-rails'
+gem 'sidekiq'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

@@ -1,56 +1,65 @@
 # frozen_string_literal: true
 
+require "benchmark"
+
 class ScrapeJob < ApplicationJob
   queue_as :default
 
   def perform(options = {})
+    scrape_depth = options["depth"].to_i
+
     uri = Uri.find(options["uri_id"])
 
-    document      = NokogiriService.call(url: uri.host)
-    initial_links = ExtractUrlService.call(doc: document)
-    scraped_uri   = uri.scraped_uris.create(links: { "0": initial_links }, user: uri.user)
+    document = NokogiriService.call(url: uri.host)
+    ExtractUrlService.call(document, 0, uri.id, uri.host)
 
-    if options["depth"].to_i.zero?
-      file_path = UrlsCsvService.generate(links: scraped_uri.links["0"])
+    if scrape_depth.zero?
+      uri.scraped_uris.create(user: uri.user, depth: scrape_depth, links: { total: Redis.current.scard("scraped_links:#{scrape_depth}:#{uri.id}") })
+      file_path = UrlsCsvService.generate(0, uri.id)
+      Redis.current.del("scraped_links:#{scrape_depth}:#{uri.id}")
       SendLinksResultsJob.perform_later(to: uri.user.email, file_path: file_path)
-    elsif options["depth"].to_i.equal?(1)
-      initial_extracted_urls = scraped_uri.links["0"].map { |link_data| link_data["url"] }
+    elsif scrape_depth.equal?(1)
+      time = Benchmark.realtime do
+        scraped_uri = uri.scraped_uris.create(user: uri.user, depth: scrape_depth, links: { total: Redis.current.scard("scraped_links:0:#{uri.id}") })
 
-      initial_extracted_urls.each do |url|
-        next unless Urls.url_valid?(url)
+        Redis.current.smembers("scraped_links:0:#{uri.id}").each do |url|
+          if Urls.url_valid?(url) == false
+            if url.start_with?("/")
+              new_url = uri.host + url
+              connection = Faraday.new(url: new_url, ssl: { verify: false })
+              response = connection.head
+              black_listed_status_codes = [404]
+              next if black_listed_status_codes.include?(response.status)
 
-        begin
-          document = NokogiriService.call(url: url)
-        rescue Faraday::ConnectionFailed => e
-          next
+              url = new_url
+              logger.info "UPDATED_URL: #{url}"
+              logger.debug "SCRAPER: URL: #{new_url} STATUS: #{response.status}"
+            else
+              next
+            end
+          end
+
+          # ensure domain is the same
+          #next if URI.parse(uri.host).host != URI.parse(url).host
+
+          begin
+            document = NokogiriService.call(url: url)
+          rescue Faraday::ConnectionFailed => e
+            logger.debug "URL: #{url} MESSAGE: #{e.message}\n#{e.backtrace.join("\n")}"
+            next
+          end
+
+          ExtractUrlService.call(document, scrape_depth, uri.id, uri.host)
         end
 
-        extracted_links = ExtractUrlService.call(doc: document)
-
-        if scraped_uri.links["1"].nil?
-          scraped_uri.links["1"] = extracted_links
-        else
-          scraped_uri.links["1"] += extracted_links
-        end
+        scraped_uri.update(links: scraped_uri.links.merge(total: Redis.current.scard("scraped_links:#{scrape_depth}:#{uri.id}")))
+        file_path = UrlsCsvService.generate(scrape_depth, uri.id)
+        Redis.current.del("scraped_links:0:#{uri.id}")
+        Redis.current.del("scraped_links:#{scrape_depth}:#{uri.id}")
+        SendLinksResultsJob.perform_later(to: uri.user.email, file_path: file_path)
       end
 
-      scraped_uri.save
-
-      # let's now clean the links and send cleaned data
-      cleaned_saved_urls = []
-      all_links = scraped_uri.links["0"] + scraped_uri.links["1"]
-      cleaned_links = []
-
-      all_links.each do |saved_link_dict|
-        scraped_url = saved_link_dict["url"]
-        next if cleaned_saved_urls.include?(scraped_url)
-
-        cleaned_links << saved_link_dict
-        cleaned_saved_urls << scraped_url
-      end
-
-      file_path = UrlsCsvService.generate(links: cleaned_links)
-      SendLinksResultsJob.perform_later(to: uri.user.email, file_path: file_path)
+      p "TIME taken = #{time}"
     end
   end
 end

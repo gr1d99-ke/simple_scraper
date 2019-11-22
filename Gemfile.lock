@@ -317,6 +317,7 @@ DEPENDENCIES
   pry-rails
   puma (~> 3.11)
   rails (~> 5.2.1)
+  redis
   reform
   reform-rails
   rspec-rails
