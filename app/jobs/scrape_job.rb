@@ -39,7 +39,7 @@ class ScrapeJob < ApplicationJob
         end
 
         # ensure domain is the same
-        #next if URI.parse(uri.host).host != URI.parse(url).host
+        next if URI.parse(uri.host).host != URI.parse(url).host
 
         begin
           document = NokogiriService.call(url: url)
