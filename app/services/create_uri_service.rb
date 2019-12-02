@@ -5,8 +5,7 @@ module CreateUriService
     params.merge!(name: SecureRandom.uuid)
     if form.validate(params)
       form.save
-      scraping_options = { uri_id: form.model.id, depth: params[:depth] }
-      begin_scraping(scraping_options)
+      begin_scraping(uri_id: form.model.id, depth: params[:depth])
       result(success?: true, form: form)
     else
       result(success?: false, form: form)
