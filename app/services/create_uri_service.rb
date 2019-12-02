@@ -1,16 +1,19 @@
+# frozen_string_literal: true
+
 module CreateUriService
-  def self.call(form, params)
-    if form.validate(name: params[:name], host: params[:host], user_id: params[:user_id])
+  def self.call(form, params = {})
+    params.merge!(name: SecureRandom.uuid)
+    if form.validate(params)
       form.save
-      options = { uri_id: form.model.id, depth: params[:depth] }
-      start_scraping(options)
+      scraping_options = { uri_id: form.model.id, depth: params[:depth] }
+      begin_scraping(scraping_options)
       result(success?: true, form: form)
     else
       result(success?: false, form: form)
     end
   end
 
-  def self.start_scraping(options = {})
+  def self.begin_scraping(options = {})
     options.stringify_keys!
     ScrapeJob.perform_later(options)
   end

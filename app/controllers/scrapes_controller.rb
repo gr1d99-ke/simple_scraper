@@ -6,14 +6,7 @@ class ScrapesController < ApplicationController
   def new; end
 
   def create
-    @user_service = CreateUserService.call(scrape_params)
-    unless @user_service.success?
-      flash.now[:alert] = @user_service.error
-    end
-
-    uri_params = { name: SecureRandom.uuid, host: scrape_params[:host], user_id: @user_service.model.id, depth: scrape_params[:depth] }
-
-    @create_uri_service = CreateUriService.call(@form, uri_params)
+    @create_uri_service = CreateUriService.call(@form, scrape_params)
     if @create_uri_service.success?
       flash['message'] = 'We will notify and send you all links via the email you provided shortly'
       redirect_to new_scrape_path

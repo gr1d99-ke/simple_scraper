@@ -36,11 +36,6 @@ RSpec.describe "ScrapeLinks", type: :request do
         it "does not create user" do
           expect { post scrapes_path, params: params }.not_to change(User, :count)
         end
-
-        it "flashes notice" do
-          post scrapes_path, params: params
-          expect(response.body).to include("Your email is required")
-        end
       end
     end
 
