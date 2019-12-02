@@ -9,11 +9,8 @@ RSpec.describe ScrapeJob, type: :job do
 
   let(:uri) { FactoryBot.create(:uri) }
   let(:valid_file) { File.read("#{scraper_test_files_path}links.html") }
-  let(:document) { NokogiriService.call(url: url) }
-  let(:links) { ExtractUrlService.call(doc: document) }
-  let(:email) { 'test@user.com' }
   let(:url) { 'http://localhost.com/links.html' }
-  let(:job_opts) { {uri_id: uri.id, depth: "1" }.stringify_keys! }
+  let(:job_opts) { { uri_id: uri.id, depth: "1" }.stringify_keys! }
 
   describe '.perform_later' do
     before do

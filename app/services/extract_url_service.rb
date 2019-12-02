@@ -3,21 +3,20 @@
 class ExtractUrlService
   attr_reader :expression, :links
 
-  def initialize(doc:, depth:, uri_id:, host:)
+  def initialize(doc:, depth:, uri_id:)
     @doc = doc
     @depth = depth
     @expression = './/a'
     @links = []
     @uri_id = uri_id
-    @host = host
   end
 
   def call
     fetch_links
   end
 
-  def self.call(doc, depth, uri_id, host)
-    new(doc: doc, depth: depth, uri_id: uri_id, host: host).call
+  def self.call(doc, depth, uri_id)
+    new(doc: doc, depth: depth, uri_id: uri_id).call
   end
 
   private

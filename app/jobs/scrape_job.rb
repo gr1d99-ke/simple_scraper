@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "benchmark"
-
 class ScrapeJob < ApplicationJob
   queue_as :default
 
@@ -11,7 +9,7 @@ class ScrapeJob < ApplicationJob
     uri = Uri.find(options["uri_id"])
 
     document = NokogiriService.call(url: uri.host)
-    ExtractUrlService.call(document, 0, uri.id, uri.host)
+    ExtractUrlService.call(document, 0, uri.id)
 
     if scrape_depth.zero?
       uri.scraped_uris.create(user: uri.user, depth: scrape_depth, links: { total: Redis.current.scard("scraped_links:#{scrape_depth}:#{uri.id}") })
@@ -31,7 +29,6 @@ class ScrapeJob < ApplicationJob
             next if black_listed_status_codes.include?(response.status)
 
             url = new_url
-            logger.info "UPDATED_URL: #{url}"
             logger.debug "SCRAPER: URL: #{new_url} STATUS: #{response.status}"
           else
             next
@@ -48,7 +45,7 @@ class ScrapeJob < ApplicationJob
           next
         end
 
-        ExtractUrlService.call(document, scrape_depth, uri.id, uri.host)
+        ExtractUrlService.call(document, scrape_depth, uri.id)
       end
 
       scraped_uri.update(links: scraped_uri.links.merge(total: Redis.current.scard("scraped_links:#{scrape_depth}:#{uri.id}")))
