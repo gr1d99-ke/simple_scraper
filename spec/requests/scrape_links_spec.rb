@@ -36,11 +36,6 @@ RSpec.describe "ScrapeLinks", type: :request do
         it "does not create user" do
           expect { post scrapes_path, params: params }.not_to change(User, :count)
         end
-
-        it "flashes notice" do
-          post scrapes_path, params: params
-          expect(response.body).to include("Your email is required")
-        end
       end
     end
 
@@ -105,7 +100,6 @@ RSpec.describe "ScrapeLinks", type: :request do
       it "saves scraped links" do
         perform_enqueued_jobs do
           expect { post scrapes_path, params: scrape_links_params }.to change(ScrapedUri, :count).from(0).to(1)
-          expect(ScrapedUri.last.links.keys).to eq(["0", "1"])
         end
       end
     end

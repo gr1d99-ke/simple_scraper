@@ -48,4 +48,7 @@ Rails.application.configure do
     from: 'no-reply@example.com'
   }
   config.active_job.queue_adapter = :sidekiq
+
+  # use MockRedis for testing, we don't need to use the actual redis
+  Redis.current = MockRedis.new
 end

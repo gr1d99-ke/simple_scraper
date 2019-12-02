@@ -6,26 +6,12 @@ class ScrapesController < ApplicationController
   def new; end
 
   def create
-    name = SecureRandom.uuid
-
-    @user_form = UserForm.new(User.new)
-    if @user_form.validate(email: scrape_params[:email])
-      @user_form.save
-    elsif @user_form.errors.messages[:email] && @user_form.errors.messages[:email].size == 1  && @user_form.errors.messages[:email].first.eql?("has already been taken")
-      @user_form = OpenStruct.new(model: User.find_by(email: scrape_params[:email]))
-    else
-      flash.now[:alert] = "Your email is required"
-    end
-
-    uri_form_params = { name: name, host: scrape_params[:host], user_id: @user_form.model.id }
-
-    if @form.validate(uri_form_params)
-      @form.save
-      options = { uri_id: @form.model.id, depth: scrape_params[:depth] }.stringify_keys!
-      ScrapeJob.perform_later(options)
+    @create_uri_service = CreateUriService.call(@form, scrape_params)
+    if @create_uri_service.success?
       flash['message'] = 'We will notify and send you all links via the email you provided shortly'
       redirect_to new_scrape_path
     else
+      @form = @create_uri_service.form
       render 'new'
     end
   end

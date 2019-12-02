@@ -3,7 +3,7 @@ require "rails_helper"
 describe UriForm do
   describe "Validations" do
     let(:user) { FactoryBot.create(:user) }
-    let(:valid_params) { { name: "test", host: "https://www.example.com", user_id: user.id } }
+    let(:valid_params) { { name: "test", host: "https://www.example.com", email: FactoryBot.generate(:email) } }
 
     context "when params are valid" do
       let(:form) { described_class.new(Uri.new) }
@@ -56,13 +56,13 @@ describe UriForm do
         end
       end
 
-      context "when user_id is not present" do
-        let(:params) { { name: "test", host: "http://www.example.com" } }
+      context "when email is not present" do
+        let(:params) { { name: "test", host: "http://www.example.com", email: "" } }
 
         it "contains error message" do
           expect(form.validate(params)).to be_falsey
           expect(form.errors.details.keys.length).to be(1)
-          expect(form.errors.details[:user_id].present?).to be_truthy
+          expect(form.errors.details[:email].present?).to be_truthy
         end
       end
     end
