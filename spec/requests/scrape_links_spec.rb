@@ -105,7 +105,6 @@ RSpec.describe "ScrapeLinks", type: :request do
       it "saves scraped links" do
         perform_enqueued_jobs do
           expect { post scrapes_path, params: scrape_links_params }.to change(ScrapedUri, :count).from(0).to(1)
-          expect(ScrapedUri.last.links.keys).to eq(["0", "1"])
         end
       end
     end
