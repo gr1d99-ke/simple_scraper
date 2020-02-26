@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :user do
     email { Faker::Internet.email }
+    password { 'password' }
 
     factory :user_with_scraped_uris do
       after(:create) do |user, count = 5|

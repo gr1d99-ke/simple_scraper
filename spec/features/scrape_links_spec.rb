@@ -4,12 +4,12 @@ require 'rails_helper'
 
 feature 'scraping links process' do
   let(:form_xpath) { ".//form[@name='links-scraper-form']" }
-  let(:url) { 'https://example.com/links.html' }
-  let(:body) { File.read("#{scraper_test_files_path}links.html") }
+  let(:url)        { 'https://example.com/links.html' }
+  let(:body)       { File.read("#{scraper_test_files_path}links.html") }
 
   before do
     visit(root_path)
-    click_on("Get Started")
+    click_on('Get Started')
   end
 
   scenario 'user sees link scraper form' do
@@ -29,27 +29,27 @@ feature 'scraping links process' do
     expect(page).to have_selector(:xpath, form_xpath)
 
     within(:xpath, form_xpath) do
-      expect(find_field('Depth').value).to eq("0")
+      expect(find_field('Depth').value).to eq('0')
 
       fill_in('Email', with: email)
       fill_in('Host', with: url)
-      select("1", from: "Depth")
+      select('1', from: 'Depth')
 
       expect(find_field('Email').value).to eq(email)
       expect(find_field('Host').value).to eq(url)
-      expect(find_field('Depth').value).to eq("1")
+      expect(find_field('Depth').value).to eq('1')
     end
   end
 
   scenario 'user submits links scraping request' do
     perform_enqueued_jobs do
       stub_custom_request(url: url, body: body)
-      stub_custom_request(url: /https:\/\/example.com\//, body: body)
+      stub_custom_request(url: %r{https://example.com/}, body: body)
 
       within(:xpath, form_xpath) do
         fill_in('Email', with: 'test@example.com')
         fill_in('Host', with: url)
-        select("1", from: "Depth")
+        select('1', from: 'Depth')
         click_on('fetch me all links')
       end
 
@@ -57,16 +57,16 @@ feature 'scraping links process' do
     end
   end
 
-  scenario "user submits a url that is not valid" do
+  scenario 'user submits a url that is not valid' do
     stub_custom_request(url: url, body: body)
 
     within(:xpath, form_xpath) do
       fill_in('Email', with: 'test@example.com')
-      fill_in('Host', with: "1")
-      select("1", from: "Depth")
+      fill_in('Host', with: '1')
+      select('1', from: 'Depth')
       click_on('fetch me all links')
     end
 
-    expect(page).to have_content("Host is not a valid url")
+    expect(page).to have_content('Host is not a valid url')
   end
 end
