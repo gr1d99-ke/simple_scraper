@@ -3,8 +3,7 @@
 class ScrapesController < ApplicationController
   before_action :set_uri_form
 
-  def new
-  end
+  def new; end
 
   def create
     @create_uri_service = CreateUriService.call(@form, scrape_params)
@@ -20,7 +19,7 @@ class ScrapesController < ApplicationController
   private
 
   def scrape_params
-    params.require(:uri).permit(:email, :host, :depth)
+    params.require(:uri).permit(:email, :host, :depth).merge!(user_id: current_user.id)
   end
 
   def set_uri_form

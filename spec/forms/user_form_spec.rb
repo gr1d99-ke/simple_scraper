@@ -4,7 +4,7 @@ require 'rails_helper'
 
 describe UserForm do
   describe 'Validations' do
-    let(:valid_params) { { email: Faker::Internet.email } }
+    let(:valid_params) { { email: Faker::Internet.email, password: 'password' } }
 
     context 'when params are valid' do
       let(:form) { described_class.new(User.new) }

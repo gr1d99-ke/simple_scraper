@@ -15,10 +15,10 @@ class Users::SessionsController < Devise::SessionsController
   end
 
   # DELETE /resource/sign_out
-   def destroy
-     cleanup_subscriptions
-     super
-   end
+  def destroy
+    cleanup_subscriptions
+    super
+  end
 
   # protected
 
