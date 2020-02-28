@@ -1,0 +1,3 @@
+SMTP_USER_NAME: [your gmail address]
+SMTP_PASSWORD: [your gmail password]
+DOMAIN: localhost

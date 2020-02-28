@@ -1,4 +1,4 @@
-<%= form_with(model: form, url: scrapes_path, local: true, method: :post, html: { name: 'links-scraper-form' }) do |f| %>
+<%= form_with(model: form, url: scrapes_path, local: true, method: :post, html: { name: 'links-scraper-form', id: 'links-scraper-form' }) do |f| %>
   <% if form.errors.any? %>
     <div id="error_explanation">
       <p><%= pluralize(form.errors.count, "error") %> prohibited this scrape from being processed: </p>

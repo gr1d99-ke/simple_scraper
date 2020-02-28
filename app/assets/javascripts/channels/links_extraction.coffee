@@ -8,5 +8,5 @@ App.links_extraction = App.cable.subscriptions.create "LinksExtractionChannel",
     # Called when the subscription has been terminated by the server
 
   received: (data) ->
-    console.log(data)
+    document.getElementById("links-count").innerHTML = data['count'];
     # Called when there's incoming data on the websocket for this channel

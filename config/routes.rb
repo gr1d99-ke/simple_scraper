@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   }
 
   mount Sidekiq::Web => '/sidekiq'
+  mount ActionCable.server => '/websocket'
 
   root to: 'welcome#index'
   resources :scrapes, only: %i[new create]

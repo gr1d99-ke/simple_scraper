@@ -1,29 +1,16 @@
 # frozen_string_literal: true
 
-class NokogiriService
-  attr_reader :url
+module NokogiriService
+  class << self
+    def call(url:)
+      response = Faraday.get(url)
+      process(body: response.body)
+    end
 
-  def initialize(url:)
-    @url = url
-  end
+    private
 
-  def call
-    connection = Faraday.new(
-      url: url,
-      ssl: { verify: false }
-    )
-
-    body = connection.get.body
-    process(body: body)
-  end
-
-  def self.call(url:)
-    new(url: url).call
-  end
-
-  private
-
-  def process(body:)
-    Nokogiri::HTML.fragment(body)
+    def process(body:)
+      Nokogiri::HTML.fragment(body)
+    end
   end
 end
