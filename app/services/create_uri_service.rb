@@ -10,10 +10,18 @@ module CreateUriService
 
         begin_scraping(uri_id: form.model.id, depth: params[:depth])
 
-        result(success?: true, form: form)
+        result do |res|
+          res[:success?] = true
+          res[:form] = form
+          res
+        end
       else
 
-        result(success?: false, form: form)
+        result do |res|
+          res[:success?] = false
+          res[:form] = form
+          res
+        end
       end
     end
 
@@ -22,8 +30,8 @@ module CreateUriService
       ScrapeJob.perform_later(options)
     end
 
-    def result(options = {})
-      OpenStruct.new(options)
+    def result(&block)
+      block.call(OpenStruct.new)
     end
 
     private

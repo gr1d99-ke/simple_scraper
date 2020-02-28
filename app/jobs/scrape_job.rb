@@ -36,8 +36,6 @@ class ScrapeJob < ApplicationJob
 
       RedisService.call do |redis|
         redis.smembers("scraped_links:0:#{uri.id}").each do |url|
-          p url
-          sleep 1.5
           if Urls.url_valid?(url) == false
             if url.start_with?("/")
               new_url = uri.host + url
