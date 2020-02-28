@@ -34,3 +34,5 @@ public/links
 /config/application.yml
 
 .generators
+
+.env

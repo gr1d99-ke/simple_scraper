@@ -7,7 +7,6 @@ class ExtractUrlService
     @doc = doc
     @depth = depth
     @expression = './/a'
-    @links = []
     @uri_id = uri_id
   end
 
@@ -24,10 +23,12 @@ class ExtractUrlService
   attr_reader :doc
 
   def fetch_links
+    counter = 0
     doc.xpath(expression).each do |element|
       extracted_link = element['href']
-
+      ActionCable.server.broadcast("l", count: counter)
       Redis.current.sadd("scraped_links:#{@depth}:#{@uri_id}", extracted_link)
+      counter += 1
     end
   end
 end

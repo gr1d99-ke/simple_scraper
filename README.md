@@ -5,7 +5,7 @@
 Is a simple Ruby on Rail web application that attempts to extract all links in any given web application __(except facebook and youtube)__.
 The application only extracts links of the given url, this means it will not follow identified links that it finds.
 
-## Nest steps
+## Next steps
 - [ ] Implement following of links to a depth of __1__ as long as it is within the scope of the url domain.
 ## Getting Started
 

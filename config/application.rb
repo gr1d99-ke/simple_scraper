@@ -30,5 +30,6 @@ module Scraper
     # Don't generate system test files.
     config.generators.system_tests = nil
     config.active_job.queue_adapter = :sidekiq
+    config.action_cable.mount_path = '/websocket'
   end
 end
