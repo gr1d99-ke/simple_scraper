@@ -3,7 +3,6 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 .counter {
-  background-color: greenyellow;
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 5px;
@@ -18,16 +17,9 @@
 }
 
 .count-text {
-  font-size: 13px;
-  font-weight: normal;
+  font-size: 15px;
+  font-weight: bold;
   margin-top: 10px;
   margin-bottom: 0;
   text-align: center;
-}
-
-.fa-2x {
-  margin: 0 auto;
-  float: none;
-  display: table;
-  color: #4ad1e5;
 }

@@ -10,7 +10,7 @@ RSpec.describe ScrapeJob, type: :job do
   let(:uri)        { FactoryBot.create(:uri, host: 'https://example.com/') }
   let(:valid_file) { File.read("#{scraper_test_files_path}links.html") }
   let(:url)        { 'http://localhost.com/links.html' }
-  let(:job_opts)   { { uri_id: uri.id, depth: '1' }.stringify_keys! }
+  let(:job_opts)   { { uri_id: uri.id, depth: '0' }.stringify_keys! }
 
   describe '.perform_later' do
     before do

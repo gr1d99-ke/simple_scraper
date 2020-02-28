@@ -6,12 +6,13 @@ class ScrapesController < ApplicationController
   def new; end
 
   def create
-    @create_uri_service = CreateUriService.call(@form, scrape_params)
-    if @create_uri_service.success?
-      flash['message'] = 'We will notify and send you all links via the email you provided shortly'
+    @result = CreateUriService.call(@form, scrape_params)
+    if @result.success?
+      begin_scraping
+      flash['message'] = 'We will send you all links to your email'
       redirect_to new_scrape_path
     else
-      @form = @create_uri_service.form
+      @form = @result.form
       render 'new'
     end
   end
@@ -24,5 +25,10 @@ class ScrapesController < ApplicationController
 
   def set_uri_form
     @form = UriForm.new(Uri.new)
+  end
+
+  def begin_scraping
+    @result.scraping_options.stringify_keys!
+    ScrapeJob.perform_later(@result.scraping_options)
   end
 end

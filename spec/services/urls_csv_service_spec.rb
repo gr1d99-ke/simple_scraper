@@ -12,8 +12,8 @@ RSpec.describe UrlsCsvService, type: :service do
       stub_custom_request(url: url, body: body)
 
       document = NokogiriService.call(url: url)
-      ExtractUrlService.call(document, scraped_uri.depth, scraped_uri.id)
-      links_file = described_class.call(scraped_uri.depth, scraped_uri.id)
+      ExtractUrlService.call(document, scraped_uri.depth, scraped_uri.uri.id)
+      links_file = described_class.call(scraped_uri.depth, scraped_uri.uri.id)
 
       expect(File.exist?(links_file)).to be_truthy
     end

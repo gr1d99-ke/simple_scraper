@@ -50,7 +50,7 @@ feature 'scraping links process' do
         click_on('fetch me all links')
       end
 
-      expect(page).to have_content('We will notify and send you all links via the email you provided shortly')
+      expect(page).to have_content('We will send you all links to your email')
     end
   end
 

@@ -3,11 +3,16 @@
 module ScraperService
   class << self
     def call(uri_id, depth)
-      uri = Uri.find(uri_id)
-      key = "scraped_links:#{depth}:#{uri.id}"
+      uri = uri_instance { |klass| klass.find(uri_id) }
+      data_key = "scraped_links:#{depth}:#{uri.id}"
+      document = nokogiri_doc(uri.host)
+
+      extract_all(document, depth, uri_id)
 
       save_scrape(uri, depth) do |scraped_uri|
-        scraped_uri.update(links: { total: RedisService.call.scard(key) })
+        scraped_uri.update(
+          links: { total: RedisService.call.scard(data_key) }
+        )
       end
 
       mail_results do |job|
@@ -15,7 +20,7 @@ module ScraperService
         job.perform_later(to: uri.user.email, file_path: file_path)
       end
 
-      cleanup_redis { |redis| redis.del(key) }
+      cleanup_redis { |redis| redis.del(data_key) }
     end
 
     private
@@ -32,6 +37,18 @@ module ScraperService
 
     def cleanup_redis(&block)
       block.call(RedisService.call)
+    end
+
+    def uri_instance(&block)
+      block.call(Uri)
+    end
+
+    def nokogiri_doc(host)
+      NokogiriService.call(url: host)
+    end
+
+    def extract_all(doc, depth, uri_id)
+      ExtractUrlService.call(doc, depth, uri_id)
     end
   end
 end

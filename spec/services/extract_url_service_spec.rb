@@ -16,8 +16,8 @@ RSpec.describe ExtractUrlService, type: :service do
 
     it 'stores links to redis set' do
       document = NokogiriService.call(url: 'http://localhost.com/links.html')
-      described_class.call(document, scraped_uri.depth, scraped_uri.id)
-      expect(Redis.current.smembers("scraped_links:0:#{scraped_uri.id}").blank?).to be_falsey
+      described_class.call(document, scraped_uri.depth, scraped_uri.uri.id)
+      expect(Redis.current.smembers("scraped_links:0:#{scraped_uri.uri.id}").blank?).to be_falsey
     end
   end
 end

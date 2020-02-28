@@ -8,11 +8,13 @@ module CreateUriService
       if form.validate(params)
         form.save
 
-        begin_scraping(uri_id: form.model.id, depth: params[:depth])
-
         return_value do |result|
           result[:success?] = true
           result[:form] = form
+          result[:scraping_options] = {
+            uri_id: form.model.id,
+            depth: params[:depth]
+          }
           result
         end
       else
@@ -23,11 +25,6 @@ module CreateUriService
           result
         end
       end
-    end
-
-    def begin_scraping(options = {})
-      options.stringify_keys!
-      ScrapeJob.perform_later(options)
     end
 
     def return_value(&block)

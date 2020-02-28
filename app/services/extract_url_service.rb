@@ -1,13 +1,21 @@
 # frozen_string_literal: true
 
 class ExtractUrlService
-  attr_reader :expression, :links
+  attr_reader :expression,
+              :links,
+              :doc,
+              :uri,
+              :depth,
+              :uri_id,
+              :scrape_key
 
   def initialize(doc:, depth:, uri_id:)
     @doc = doc
     @depth = depth
     @expression = './/a'
     @uri_id = uri_id
+    @uri = Uri.find(uri_id)
+    @scrape_key = "scraped_links:#{depth}:#{uri_id}"
   end
 
   def call
@@ -20,14 +28,20 @@ class ExtractUrlService
 
   private
 
-  attr_reader :doc
-
   def fetch_links
     counter = 0
     doc.xpath(expression).each do |element|
       extracted_link = element['href']
+
       ActionCable.server.broadcast("l", count: counter)
-      Redis.current.sadd("scraped_links:#{@depth}:#{@uri_id}", extracted_link)
+
+      next if extracted_link.nil?
+
+      if extracted_link.starts_with?('/')
+        extracted_link = uri.host + extracted_link
+      end
+
+      Redis.current.sadd(scrape_key, extracted_link)
       counter += 1
     end
   end
