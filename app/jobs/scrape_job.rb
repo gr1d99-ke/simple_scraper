@@ -11,22 +11,7 @@ class ScrapeJob < ApplicationJob
     ExtractUrlService.call(document, 0, uri.id)
 
     if scrape_depth.zero?
-      key = "scraped_links:#{scrape_depth}:#{uri.id}"
-
-      save_scrape(uri, scrape_depth) do |scraped_uri|
-        scraped_uri.links = { total: RedisService.call.scard(key) }
-        scraped_uri.save
-      end
-
-      file_path = UrlsCsvService.call(0, uri.id)
-
-      mail_results do |job|
-        job.perform_later(to: uri.user.email, file_path: file_path)
-      end
-
-      RedisService.call do |redis|
-        redis.del(key)
-      end
+      ScraperService.call(options['uri_id'], scrape_depth)
     elsif scrape_depth.equal?(1)
       scraped_uri = save_scrape(uri, scrape_depth) do |scraped_uri|
         scraped_uri.links = { total: Redis.current.scard("scraped_links:0:#{uri.id}") }
@@ -36,18 +21,17 @@ class ScrapeJob < ApplicationJob
 
       RedisService.call do |redis|
         redis.smembers("scraped_links:0:#{uri.id}").each do |url|
-          if Urls.url_valid?(url) == false
-            if url.start_with?("/")
-              new_url = uri.host + url
-              connection = Faraday.new(url: new_url, ssl: { verify: false })
-              response = connection.head
-              black_listed_status_codes = [404]
-              next if black_listed_status_codes.include?(response.status)
+          unless Urls.url_valid?(url)
+            next unless url.start_with?('/')
 
-              url = new_url
-            else
-              next
-            end
+            new_url = uri.host + url
+            connection = Faraday.new(url: new_url, ssl: { verify: false })
+            response = connection.head
+            black_listed_status_codes = [404]
+
+            next if black_listed_status_codes.include?(response.status)
+
+            url = new_url
           end
 
           # ensure domain is the same
@@ -55,8 +39,7 @@ class ScrapeJob < ApplicationJob
 
           begin
             document = NokogiriService.call(url: url)
-          rescue Faraday::ConnectionFailed => e
-            logger.debug "URL: #{url} MESSAGE: #{e.message}\n#{e.backtrace.join("\n")}"
+          rescue Faraday::ConnectionFailed
             next
           end
 
@@ -67,7 +50,8 @@ class ScrapeJob < ApplicationJob
       scraped_uri.update(
         links: scraped_uri.links.merge(
           total: RedisService.call.scard(
-            "scraped_links:#{scrape_depth}:#{uri.id}")
+            "scraped_links:#{scrape_depth}:#{uri.id}"
+          )
         )
       )
 
