@@ -32,10 +32,10 @@ feature 'scraping links process' do
       expect(find_field('Depth').value).to eq('0')
 
       fill_in('Host', with: url)
-      select('1', from: 'Depth')
+      #select('1', from: 'Depth')
 
       expect(find_field('Host').value).to eq(url)
-      expect(find_field('Depth').value).to eq('1')
+      #expect(find_field('Depth').value).to eq('1')
     end
   end
 
@@ -46,7 +46,7 @@ feature 'scraping links process' do
 
       within(:xpath, form_xpath) do
         fill_in('Host', with: url)
-        select('1', from: 'Depth')
+        #select('1', from: 'Depth')
         click_on('fetch me all links')
       end
 
@@ -59,7 +59,7 @@ feature 'scraping links process' do
 
     within(:xpath, form_xpath) do
       fill_in('Host', with: '1')
-      select('1', from: 'Depth')
+      #select('1', from: 'Depth')
       click_on('fetch me all links')
     end
 

@@ -7,7 +7,8 @@ class ExtractUrlService
               :uri,
               :depth,
               :uri_id,
-              :scrape_key
+              :scrape_key,
+              :user
 
   def initialize(doc:, depth:, uri_id:)
     @doc = doc
@@ -15,6 +16,7 @@ class ExtractUrlService
     @expression = './/a'
     @uri_id = uri_id
     @uri = Uri.find(uri_id)
+    @user = uri.user
     @scrape_key = "scraped_links:#{depth}:#{uri_id}"
   end
 
@@ -33,7 +35,7 @@ class ExtractUrlService
     doc.xpath(expression).each do |element|
       extracted_link = element['href']
 
-      ActionCable.server.broadcast("l", count: counter)
+      LinksExtractionChannel.broadcast_to(user, count: counter)
 
       next if extracted_link.nil?
 
