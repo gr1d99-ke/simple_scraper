@@ -22,7 +22,7 @@ module ScraperService
         job.perform_later(to: uri.user.email, file_path: csv_path)
       end
 
-      #cleanup_redis { |redis| redis.del(storage_key) }
+      cleanup_redis { |redis| redis.del(storage_key) }
     end
 
     private
