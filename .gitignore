@@ -36,3 +36,5 @@ public/links
 .generators
 
 .env
+
+dump.rdb

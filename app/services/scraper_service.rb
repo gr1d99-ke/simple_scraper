@@ -3,33 +3,44 @@
 module ScraperService
   class << self
     def call(uri_id, depth)
-      uri = uri_instance { |klass| klass.find(uri_id) }
-      data_key = "scraped_links:#{depth}:#{uri.id}"
+      uri = uri_model { |klass| klass.find(uri_id) }
+      storage_key = "scraped_links:#{depth}:#{uri.id}"
       document = nokogiri_doc(uri.host)
 
       extract_all(document, depth, uri_id)
 
-      save_scrape(uri, depth) do |scraped_uri|
+      go_deeper(depth, storage_key, uri_id) if depth.positive?
+
+      create_scraped_uri(uri, depth) do |scraped_uri|
         scraped_uri.update(
-          links: { total: RedisService.call.scard(data_key) }
+          links: { total: RedisService.call.scard(storage_key) }
         )
       end
 
-      mail_results do |job|
-        file_path = UrlsCsvService.call(depth, uri.id)
-        job.perform_later(to: uri.user.email, file_path: file_path)
+      csv_path = UrlsCsvService.call(depth, uri.id)
+      mail_csv_to_user do |job|
+        job.perform_later(to: uri.user.email, file_path: csv_path)
       end
 
-      cleanup_redis { |redis| redis.del(data_key) }
+      #cleanup_redis { |redis| redis.del(storage_key) }
     end
 
     private
 
-    def mail_results(job_klass = SendLinksResultsJob, &block)
+    def go_deeper(depth, storage_key, uri_id)
+      (0...depth).each do
+        RedisService.call.smembers(storage_key).each do |url|
+          doc = nokogiri_doc(url)
+          extract_all(doc, depth, uri_id)
+        end
+      end
+    end
+
+    def mail_csv_to_user(job_klass = SendLinksResultsJob, &block)
       block.call(job_klass)
     end
 
-    def save_scrape(uri, depth, &block)
+    def create_scraped_uri(uri, depth, &block)
       scraped_uri = uri.scraped_uris.create(user: uri.user, depth: depth)
 
       block.call(scraped_uri)
@@ -39,7 +50,7 @@ module ScraperService
       block.call(RedisService.call)
     end
 
-    def uri_instance(&block)
+    def uri_model(&block)
       block.call(Uri)
     end
 
