@@ -1,3 +1,6 @@
-SMTP_USER_NAME: [your gmail address]
-SMTP_PASSWORD: [your gmail password]
-DOMAIN: localhost
+SMTP_USER_NAME: ['your gmail address']
+SMTP_PASSWORD: ['your gmail password']
+DOMAIN: 'localhost'
+POSTGRES_USERNAME: ['your db username']
+POSTGRES_PASSWORD: ['your db password']
+REDIS_URL: ['valid redis url']

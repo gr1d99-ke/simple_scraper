@@ -1,0 +1,44 @@
+version: '3'
+services:
+  redis:
+    image: redis:5.0.7-alpine
+    ports:
+      - '6379:6379'
+
+  db:
+    image: postgres:12.1-alpine
+    ports:
+      - '5432:5432'
+    env_file:
+      - .docker-database-dev.env
+
+  sidekiq:
+    build: .
+    command: /bin/sh -c 'bundle exec sidekiq'
+    volumes:
+      - .:/my-app
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .docker-web-dev.env
+      - .docker-database-dev.env
+    tty: true
+    stdin_open: true
+
+  app:
+    build: .
+    command: /bin/sh -c 'rm -rf /my-app/tmp/pids/server.pid && bundle exec rails s -b 0.0.0.0 -p 3000'
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/my-app
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .docker-web-dev.env
+      - .docker-database-dev.env
+    tty: true
+    stdin_open: true
+
