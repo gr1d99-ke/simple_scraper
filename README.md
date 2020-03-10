@@ -1,6 +1,6 @@
 [![HitCount](http://hits.dwyl.io/gr1d99/my-scraper.svg)](http://hits.dwyl.io/gr1d99/my-scraper)
 
-# My-Scraper
+# simple_links_scraper
 
 Is a simple Ruby on Rail web application that attempts to extract all links in any given web application __(except facebook and youtube)__.
 The application only extracts links of the given url, this means it will not follow identified links that it finds.
