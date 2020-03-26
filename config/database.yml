@@ -84,4 +84,3 @@ test:
 production:
   <<: *default
   database: scraper_production
-  username: scraper
