@@ -2,11 +2,9 @@
 
 # My-Scraper
 
-Is a simple Ruby on Rail web application that attempts to extract all links in any given web application __(except facebook and youtube)__.
+Is a simple Ruby on Rail web application that attempts to extract all links in any given web application __(except web apps that require javascript)__.
 The application only extracts links of the given url, this means it will not follow identified links that it finds.
 
-## Next steps
-- [ ] Implement following of links to a depth of __1__ as long as it is within the scope of the url domain.
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine
@@ -38,6 +36,14 @@ A step by step series of examples that tell you how to get a development env run
 8. Start sidekiq `bundle exec sidekiq -q default -q mailers`
 9. Start development server `rails s` :sunglasses:
 
+### Docker Folks
+1. Install [docker-compose](https://docs.docker.com/compose/install/)
+2. Run `docker-compose build`
+3. Create Database `docker-compose run app bundle rake db:create`
+4. Run migrations `docker-compose run app bundle exec rake db:migrate`
+5. Start your app `docker-compose up`
+6. Visit [http://localhost:3000](http://localhost:3000)
+
 ## Running the tests
 
 `bundle exec rspec`
@@ -49,6 +55,7 @@ A step by step series of examples that tell you how to get a development env run
 * [Postgres](https://www.postgresql.org/) - Database
 * [Sidekiq](https://sidekiq.org/) - For background jobs
 * [Faraday](https://github.com/lostisland/faraday) - For external HTTP requests
+* [Redis](https://redis.io/) - Fast data store
 
 ## Authors
 
