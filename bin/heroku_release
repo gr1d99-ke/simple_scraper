@@ -11,9 +11,6 @@ def system!(*args)
 end
 
 chdir APP_ROOT do
-  puts "\n== Create database =="
-  system! 'bin/rails db:schema:load'
-
   puts "\n== Migrate database =="
   system! 'bin/rails db:migrate'
 end
