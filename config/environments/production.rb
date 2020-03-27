@@ -107,7 +107,7 @@ Rails.application.configure do
   }
 
   # Redis
-  Redis.current = Redis.new(url: ENV['REDISTOGO_URL'])
+  Redis.current = Redis.new(url: ENV['REDISCLOUD_URL'])
 
   config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
 end
