@@ -91,4 +91,23 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: 'smtp.gmail.com',
+    port: 587,
+    domain: ENV['DOMAIN'],
+    user_name: ENV['SMTP_USER_NAME'],
+    password: ENV['SMTP_PASSWORD'],
+    authentication: 'plain',
+    enable_starttls_auto: true
+  }
+  config.action_mailer.default_options = {
+    from: 'no-reply@example.com'
+  }
+
+  # Redis
+  Redis.current = Redis.new(url: ENV['REDISTOGO_URL'])
+
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
 end
