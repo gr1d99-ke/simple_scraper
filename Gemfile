@@ -36,6 +36,7 @@ gem 'jbuilder', '~> 2.5'
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.1.0', require: false
 gem "bootstrap", ">= 4.3.1"
+gem 'capybara'
 gem 'devise'
 gem 'faraday'
 gem 'foreman'
@@ -45,6 +46,7 @@ gem "nokogiri", ">= 1.10.4"
 gem "redis"
 gem 'reform'
 gem 'reform-rails'
+gem 'selenium-webdriver'
 gem 'sidekiq'
 gem 'passenger'
 
@@ -59,6 +61,7 @@ group :development, :test do
 end
 
 group :development do
+	gem 'puma'
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console', '>= 3.3.0'
   gem 'listen', '>= 3.0.5', '< 3.2'
