@@ -10,6 +10,18 @@
     </div>
   <% end %>
 
+  <fieldset class="form-group">
+    <%= label_tag('Host to scrape') %>
+    <div class="form-check">
+      <%= radio_button_tag(:host, 'new', class: "form-check-input") %>
+      <%= label_tag(:host_new, 'Type a New Host', class: "form-check-label") %>
+    </div>
+    <div class="form-check">
+      <%= radio_button_tag(:host, 'saved', class: "form-check-input") %>
+      <%= label_tag(:host_saved, 'Choose from Saved Hosts', class: "form-check-label") %>
+    </div>
+  </fieldset>
+
   <div class="form-group">
     <%= f.label(:host) %>
     <%= f.text_field(:host, placeholder: 'https://www.example.com', class: 'form-control', required: false) %>
